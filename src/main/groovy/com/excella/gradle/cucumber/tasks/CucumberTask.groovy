@@ -6,9 +6,12 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.SourceSetOutput
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import java.lang.reflect.Field
 
 import static org.apache.commons.lang.reflect.FieldUtils.readField
 
@@ -79,8 +82,10 @@ class CucumberTask extends DefaultTask  {
                 // add output resources dir for non-Java-class implementations
                 dirs << sourceSet.output.resourcesDir.path
                 sourceSet.output.getClassesDirs()
-                if(FieldUtils.hasProperty(sourceSet.output, "classesDirs")){
-                    ((FileCollection) readField(sourceSet.output, "classesDirs")).each { classesDir ->
+
+                def field = FieldUtils.getDeclaredField(SourceSetOutput.class, "classesDirs", true)
+                if(field != null) {
+                    ((FileCollection) readField(sourceSet.output, "classesDirs", true)).each { classesDir ->
                         processClassDir(classesDir)
                     }
                 } else {
