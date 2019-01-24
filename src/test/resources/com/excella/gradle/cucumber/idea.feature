@@ -1,7 +1,7 @@
 Feature: Integration with Idea plugin
 
   Scenario: The Cucumber should run successfully when the Idea plugin is used in the same project
-    Given I have a new Gradle project (wrapper v2.1) using Cucumber v1.1.8 for compile
+    Given I have a new Gradle project (wrapper v4.0) using Cucumber v1.1.8 for compile
     And I configure v0.8 of the Cucumber plugin from jcenter
     And I apply the "idea" builtin plugin
     And I write "src/cucumber/resources/com/my/the.feature" as follows
@@ -34,7 +34,7 @@ Feature: Integration with Idea plugin
     Then it should succeed
 
   Scenario: The Cucumber should run successfully when the Idea plugin is used in the same project using latest build
-    Given I have a new Gradle project (wrapper v2.1) using Cucumber v1.2.2 for compile
+    Given I have a new Gradle project (wrapper v4.0) using Cucumber v1.2.2 for compile
     And I apply the "idea" builtin plugin
     And I write "src/cucumber/resources/com/my/the.feature" as follows
     """

@@ -30,7 +30,7 @@ class CucumberPlugin  implements Plugin<Project> {
         try {
             CUCUMBER_RUNTIME_CONFIGURATION_NAME = CUCUMBER_SOURCE_SET_NAME + 'Runtime'
             CUCUMBER_COMPILE_CONFIGURATION_NAME = CUCUMBER_SOURCE_SET_NAME + "Compile"
-        }catch(NoClassDefFoundError e){
+        } catch(NoClassDefFoundError e){
             throw new PluginInstantiationException("Cucumber plugin only works with gradle version above 2.0 due to groovy version in older gradle versions")
         }
     }

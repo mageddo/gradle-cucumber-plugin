@@ -39,7 +39,7 @@ public class Helper extends TemporaryFolder {
     ProcessRunner runner = new ProcessRunner(new ProcessBuilder(new File(gradlewScript).getAbsolutePath(), "-q", "printMainRuntimeClasspath"));
     int exitCode = runner.run();
     if (exitCode != 0) {
-      throw new IOException("command failed: " + exitCode);
+      throw new IOException("command failed: " + exitCode + "\n" + runner.getOut() + "\n" + runner.getErr());
     }
 
     BufferedReader reader = new BufferedReader(new StringReader(runner.getOut()));
