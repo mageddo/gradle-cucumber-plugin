@@ -40,6 +40,7 @@ dependencies {
 
     def CUCUMBER_VERSION = '1.2.2'
     provided 'info.cukes:cucumber-core:' + CUCUMBER_VERSION
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     testCompile 'junit:junit:4.11'
     testCompile 'info.cukes:cucumber-junit:' + CUCUMBER_VERSION
@@ -159,6 +160,7 @@ task createWrapper(type: Wrapper) {
 
 task printMainRuntimeClasspath {
     description 'Prints the runtime classpath of the built artifact (used by Cucumber acceptance tests)'
-} << {
-    sourceSets.main.runtimeClasspath.each { println it }
+    doLast {
+        sourceSets.main.runtimeClasspath.each { println it }
+    }
 }

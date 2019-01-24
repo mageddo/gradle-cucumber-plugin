@@ -3,9 +3,12 @@ package com.excella.gradle.cucumber
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.file.IdentityFileResolver
+import org.gradle.process.CommandLineArgumentProvider
 import org.gradle.process.JavaForkOptions
 import org.gradle.process.ProcessForkOptions
 import org.gradle.process.internal.DefaultJavaForkOptions
+
+import javax.annotation.Nullable
 
 /**
  * DSL extension.
@@ -20,7 +23,7 @@ class CucumberJvmOptions implements JavaForkOptions, ProcessForkOptions {
     }
 
     CucumberJvmOptions(FileResolver fileResolver) {
-        forkOptions= new DefaultJavaForkOptions(fileResolver)
+        forkOptions = new DefaultJavaForkOptions(fileResolver)
     }
 
     @Override
@@ -81,6 +84,11 @@ class CucumberJvmOptions implements JavaForkOptions, ProcessForkOptions {
     }
 
     @Override
+    void setJvmArgs(@Nullable List<String> jvmArgs) {
+        this.forkOptions.setJvmArgs(jvmArgs)
+    }
+
+    @Override
     void setJvmArgs(Iterable<?> objects) {
         forkOptions.setJvmArgs(objects)
     }
@@ -95,6 +103,11 @@ class CucumberJvmOptions implements JavaForkOptions, ProcessForkOptions {
     JavaForkOptions jvmArgs(Object... objects) {
         forkOptions.jvmArgs(objects)
         return this
+    }
+
+    @Override
+    List<CommandLineArgumentProvider> getJvmArgumentProviders() {
+        return forkOptions.jvmArgumentProviders
     }
 
     @Override
@@ -139,6 +152,11 @@ class CucumberJvmOptions implements JavaForkOptions, ProcessForkOptions {
     }
 
     @Override
+    void setAllJvmArgs(List<String> allJvmArgs) {
+        forkOptions.setAllJvmArgs(allJvmArgs)
+    }
+
+    @Override
     void setAllJvmArgs(Iterable<?> objects) {
         forkOptions.setAllJvmArgs(objects)
     }
@@ -155,6 +173,11 @@ class CucumberJvmOptions implements JavaForkOptions, ProcessForkOptions {
     }
 
     @Override
+    void setExecutable(String executable) {
+        forkOptions.setExecutable(executable)
+    }
+
+    @Override
     void setExecutable(Object o) {
         forkOptions.setExecutable(o)
     }
@@ -168,6 +191,11 @@ class CucumberJvmOptions implements JavaForkOptions, ProcessForkOptions {
     @Override
     File getWorkingDir() {
         return forkOptions.getWorkingDir()
+    }
+
+    @Override
+    void setWorkingDir(File file) {
+        forkOptions.setWorkingDir(file)
     }
 
     @Override

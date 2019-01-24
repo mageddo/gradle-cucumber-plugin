@@ -1,6 +1,7 @@
 package com.excella.gradle.cucumber.tasks
 
 import com.excella.gradle.cucumber.CucumberJvmOptions
+import org.apache.commons.lang.reflect.FieldUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.JavaExec
@@ -8,6 +9,8 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import static org.apache.commons.lang.reflect.FieldUtils.readField
 
 /**
  * Defines the cucumber task that can be used in a gradle build file.  This class creates its own
@@ -27,7 +30,7 @@ class CucumberTask extends DefaultTask  {
 
     def runner
     List<String> glueDirs
-	List<String> featureDirs
+    List<String> featureDirs
     List<String> tags
     List<String> formats
     boolean strict
@@ -48,15 +51,15 @@ class CucumberTask extends DefaultTask  {
 
         try {
             runner.runCucumberTests(
-                  execTask,
-                  getCucumberClasspath(),
-                  getOrDetectGlueDirs(),
-                  getTags(),
-                  getFormats(),
-                  getStrict(),
-                  getMonochrome(),
-                  getDryRun(),
-                  getFeatureDirs())
+                    execTask,
+                    getCucumberClasspath(),
+                    getOrDetectGlueDirs(),
+                    getTags(),
+                    getFormats(),
+                    getStrict(),
+                    getMonochrome(),
+                    getDryRun(),
+                    getFeatureDirs())
         }catch(Exception exception){
             if(!getIgnoreFailures()){
                 throw exception
@@ -75,28 +78,35 @@ class CucumberTask extends DefaultTask  {
             glueSourceSets.each { sourceSet ->
                 // add output resources dir for non-Java-class implementations
                 dirs << sourceSet.output.resourcesDir.path
-
-                sourceSet.output.classesDirs.each { classesDir ->
-                    if (classesDir.exists()) {
-                        // add all subdirs of the classes dir for compiled implementations
-                        def packages = new TreeSet()
-                        def classesDirPathLength = classesDir.path.length() + 1
-
-                        classesDir.traverse { File file ->
-                            if (file.isFile()) {
-                                String relativePath = file.path.substring(classesDirPathLength)
-                                def packageDir = relativePath.
-                                        replace(File.separator, '/'). // make sure we are dealing with slashes
-                                        replaceFirst('/?[^/]*$', ''). // remove the file name --> keep the parent dir path
-                                        replace('/', '.') // turn into a package name
-                                packages << "classpath:${packageDir}".toString()
-                            }
-                        }
-                        dirs.addAll(packages)
+                if(FieldUtils.hasProperty(sourceSet.output, "classesDirs")){
+                    ((FileCollection) readField(sourceSet.output, "classesDirs")).each { classesDir ->
+                        processClassDir(classesDir)
                     }
+                } else {
+                    processClassDir(sourceSet.output.classesDir)
                 }
             }
         }
         dirs.unique()
+    }
+
+    private void processClassDir(File classesDir) {
+        if (classesDir.exists()) {
+            // add all subdirs of the classes dir for compiled implementations
+            def packages = new TreeSet()
+            def classesDirPathLength = classesDir.path.length() + 1
+
+            classesDir.traverse { File file ->
+                if (file.isFile()) {
+                    String relativePath = file.path.substring(classesDirPathLength)
+                    def packageDir = relativePath.
+                            replace(File.separator, '/'). // make sure we are dealing with slashes
+                            replaceFirst('/?[^/]*$', ''). // remove the file name --> keep the parent dir path
+                            replace('/', '.') // turn into a package name
+                    packages << "classpath:${packageDir}".toString()
+                }
+            }
+            dirs.addAll(packages)
+        }
     }
 }
